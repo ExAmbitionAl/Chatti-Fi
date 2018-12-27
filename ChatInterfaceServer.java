@@ -3,10 +3,10 @@ import java.awt.event.*;
 import java.net.*;
 import java.io.*;
 
-public class ChatInterface 
+public class ChatInterfaceServer 
 {
   static String serName  ="localhost";
-  static int port = 9000;
+  static int port = 4040;
   
   private static JFrame f;
   private static JTextArea prepiska;
@@ -14,14 +14,15 @@ public class ChatInterface
   private static JTextField tfPoruka, tfHost, tfPort;
   
   static Socket sock;
+  static ServerSocket sers;
   static DataOutputStream ostream;
   static DataInputStream istream;
   
-  static boolean isConnected;
+  static boolean isConnected = false;
   /////////////////////////////////////////////////////////////////
   private static void frameSettings(JFrame f, int x,int y )
   {
-    f = new JFrame("Chat Client");
+    f = new JFrame("chat Server");
     prepiska = new JTextArea();
     
     f.setSize(x,y);
@@ -77,53 +78,48 @@ public class ChatInterface
         String msgout="";
         try {
             msgout=tfPoruka.getText().trim();
-            prepiska.append("\n Client: " + msgout);
-            ostream.writeUTF("Client: "+msgout);
+            prepiska.append("\n Server: " + msgout);
+            ostream.writeUTF("Server: "+msgout);
             tfPoruka.setText("");
         } catch (Exception e) {
         }             
         }
     };
   
-  
   public static ActionListener taskConnector = new ActionListener() {
         public void actionPerformed(ActionEvent ev)
         {
-            isConnected = true;
+          if(!isConnected)
+          {
+            isConnected = true;            
+          }
         }
         
     };
   
-  
   public static void main(String args[]) throws Exception
   {
-    
-   /* Socket sock;
-    sock = new Socket("127.0.0.1",3030);
-       
-    ostream = sock.getOutputStream(); 
-    pwrite = new PrintWriter(ostream, true);
-     
-     InputStream istream = sock.getInputStream();
-     BufferedReader receiveRead = new BufferedReader(new InputStreamReader(istream));
-    
-    String receiveMessage, sendMessage;*/
     String msgin ="";
     
         frameSettings(f,800,600+5);    
         try{
-    /*sock=new Socket("localhost", 9000);
-    istream=new DataInputStream(sock.getInputStream());
-    ostream=new DataOutputStream(sock.getOutputStream());*/
+          sers = new ServerSocket(9000);
+          sock = sers.accept();
+          istream = new DataInputStream(sock.getInputStream());
+          ostream = new DataOutputStream(sock.getOutputStream());
           
-            while(!msgin.equals("exit")){
-            if(isConnected){
-              sock=new Socket("localhost", 9000);
-              istream=new DataInputStream(sock.getInputStream());
-              ostream=new DataOutputStream(sock.getOutputStream());
-              msgin=istream.readUTF();
+            
+              
+            while(!msgin.equals("exit"))
+            {
+              
+              /*sers = new ServerSocket(9000);
+              sock = sers.accept();
+              istream = new DataInputStream(sock.getInputStream());
+              ostream = new DataOutputStream(sock.getOutputStream());*/
+              msgin = istream.readUTF();
               prepiska.setText(prepiska.getText().trim()+"\n"+msgin);
-            }
+            
           }
     
         }
@@ -134,3 +130,4 @@ public class ChatInterface
 
   }
 }
+
